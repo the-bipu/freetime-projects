@@ -502,12 +502,11 @@ body {
     justify-content: center;
 
     font-size: 3rem;
-    margin-top: 3rem;
     color: #EFEBE5;
+    padding-top: 3rem;
 }
 
 .about-sec-7 {
-    height: 80%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -541,6 +540,33 @@ body {
 .third-sec-7 {
     margin: 1rem 0 2rem 1rem;
     padding: 1.2rem;
+}
+
+@media screen and (max-width:768px) {
+    .container-7 {
+        height: auto;
+    }
+
+    .about-sec-7 {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 3rem 0;
+    }
+
+    .first-sec-7 {
+        margin: 0;
+        padding: 0 2rem;
+    }
+    
+    .second-sec-7 {
+        margin: 0;
+        padding: 0 2rem;
+    }
+    
+    .third-sec-7 {
+        margin: 0;
+        padding: 0 2rem;
+    }
 }
 
 /* Contents of Container 8 */
