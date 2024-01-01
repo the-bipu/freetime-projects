@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Exams</title>
+    <link rel="stylesheet" href="Style-OA.css">
+</head>
+
+<body>
+    <!-- Start Quiz Button -->
+    <div class="start_btn"><button>Start Exam</button></div>
+
+    <!-- Info Box -->
+    <div class="info_box">
+        <div class="info_title">
+            <span>Some Rules of this Exam</span>
+        </div>
+        <div class="info_list">
+            <div class="info">1. You will have only <span>50 Seconds</span> per each Questions.</div>
+            <div class="info">2. Once you select your answer, you can't reselect it.</div>
+            <div class="info">3. You can't select any option once time goes off.</div>
+            <div class="info">4. You can't exit while you're giving the Exam.</div>
+            <div class="info">5. You'll get points on the basis of your correct answer.</div>
+            <div class="info">6. No negative marking available.</div>
+        </div>
+        <div class="buttons">
+            <button class="quit">Exit Exam</button>
+            <button class="restart">Continue</button>
+        </div>
+    </div>
+
+    <div class="bounce">
+        <img src="../images/MainLogo.png" alt="Logo">
+    </div>
+
+    <!-- <div class="form">
+        <fieldset class="fieldset" style="border: 3px solid black;">
+            <legend style="color: rgb(2, 2, 15);">Personal Info</legend>
+            <br>
+            &nbsp;&nbsp;<label for="fname">Name:</label><br>
+            &nbsp;&nbsp;<input type="text" id="formbox" name="name" value="" placeholder="&nbsp; Name"><br><br>
+            &nbsp;&nbsp;<label for="lname">Father's Name:</label><br>
+            &nbsp;&nbsp;<input type="text" id="formbox" name="lname" value=""
+                placeholder="&nbsp; Father's Name"><br><br>
+            &nbsp;&nbsp;<label for="lname">Reg. No : </label><br>
+            &nbsp;&nbsp;<input type="text" id="formbox" name="lname" value="" placeholder="&nbsp; Reg. No."><br><br>
+        </fieldset><br>
+        <center><input style="width: 70px; height: 29px; background-color: aqua; border-color: black;" type="button"
+                onclick="alert('You can start Now !')" value="Click Me!"></center>
+    </div> -->
+
+    <!-- Quiz box -->
+    <div class="quiz_box">
+        <header>
+            <div class="title">IICSE Online Examination</div>
+            <div class="timer">
+                <div class="time_text">Time Left</div>
+                <div class="timer_sec">50</div>
+            </div>
+            <!-- <div class="time_line"></div> -->
+        </header>
+        <section>
+            <div class="que_text">
+                <!-- <span>What does HTML stand for?</span> -->
+            </div>
+            <div class="option_list">
+                <!-- <div class="option">
+                    <span>Hyper Text Preprocessor</span>
+                    <div class="icon tick"><i class="fas fa-check"></i></div>
+                </div>
+                <div class="option">
+                    <span>Hyper Text Markup Language</span>
+                    <div class="icon cross"><i class="fas fa-times"></i></div>
+                </div>
+                <div class="option">
+                    <span>Hyper Text Multiple Language</span>
+                </div>
+                <div class="option">
+                    <span>Hyper Tool Multi Language</span>
+                </div> -->
+            </div>
+        </section>
+
+        <!-- Quiz Box Footer -->
+        <footer>
+            <div class="total_que">
+                <!-- <span>
+                    <p>2</p>of<p>5</p>Questions
+                </span> -->
+            </div>
+            <button class="next_btn">Next Que</button>
+        </footer>
+    </div>
+
+    <!-- Result Box -->
+    <div class="result_box">
+        <div class="icon">
+            <!-- <img style="height:60px; width:auto" src="../images/MainLogo.png" alt="IICSE logo"> -->
+            <i class="fas fa-crown"></i><p>♛</p>
+        </div>
+        <div class="complete_text">You've completed the Exams !</div>
+        <div class="score_text">
+            <!-- <span>and sorry, You got only <p>2</p> out of <p>5</p></span> -->
+        </div>
+        <div class="buttons">
+            <button class="restart">Retake Exams</button>
+            <button class="quit">Quit Exams</button>
+        </div>
+    </div>
+
+    <script src="Set-OAB.js"></script>
+    <script src="Script-OA.js"></script>
+
+</body>
+
+</html>
