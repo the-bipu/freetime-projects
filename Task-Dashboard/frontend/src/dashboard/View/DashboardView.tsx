@@ -2,11 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import './dashboardModule.scss';
 
+import { MdDelete } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
+import { BiTaskX } from "react-icons/bi";
+import { BiTask } from "react-icons/bi";
+
 interface Task {
     title: string;
     description: string;
-    dueDate: string;
+    dueDate: Date;
     priority: string;
+    completed: boolean;
 }
 
 const DashboardView = () => {
@@ -14,14 +20,53 @@ const DashboardView = () => {
     const [dataBox, setDataBox] = useState(false);
     const [tasks, setTasks] = useState<Task[]>([]);
 
+    const [editIndex, setEditIndex] = useState<number | null>(null);
+    const [updatedTask, setUpdatedTask] = useState<Task | null>(null);
 
-    useEffect(() => {
-        const storedTasksString = localStorage.getItem('tasks');
-        const storedTasks = storedTasksString ? JSON.parse(storedTasksString) : [];
-        if (storedTasks) {
-            setTasks(storedTasks);
+    const [completedTasks, setCompletedTasks] = useState<number[]>([]);
+    const [clickedButton, setClickedButton] = useState('All');
+
+    const handleButtonClick = (buttonName: string) => {
+        console.log(clickedButton);
+        setClickedButton(buttonName);
+    };
+
+    // const taskCompleted = (index: number) => {
+    //     const taskIndex = completedTasks.indexOf(index);
+    //     if (taskIndex !== -1) {
+    //         const updatedCompletedTasks = completedTasks.filter((task) => task !== index);
+    //         setCompletedTasks(updatedCompletedTasks);
+    //     } else {
+    //         const updatedCompletedTasks = [...completedTasks, index];
+    //         setCompletedTasks(updatedCompletedTasks);
+    //     }
+    // };
+
+    const taskCompleted = (index: number) => {
+        const completedIndex = completedTasks.indexOf(index);
+
+        if (completedIndex !== -1) {
+            const updatedCompletedTasks = completedTasks.filter((task) => task !== index);
+            setCompletedTasks(updatedCompletedTasks);
+        } else {
+            const updatedCompletedTasks = [...completedTasks, index];
+            setCompletedTasks(updatedCompletedTasks);
         }
-    }, []);
+
+        const updatedTasks = tasks.map((task, i) => {
+            if (i === index) {
+                return { ...task, completed: !task.completed };
+            }
+            return task;
+        });
+
+        setTasks(updatedTasks);
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    };
+
+
+    const currentDate = new Date();
+    console.log(currentDate);
 
     const toggleDashboard = () => {
         setShowdb(!showdb);
@@ -34,52 +79,135 @@ const DashboardView = () => {
     const handleFormSubmit = (e: any) => {
         e.preventDefault();
 
-        // Collect form input values
         const title = e.target.elements.title.value;
         const description = e.target.elements.description.value;
-        const dueDate = e.target.elements.date.value;
+        const dueDate = new Date(e.target.elements.dueDate.value);
         const priority = e.target.elements.priority.value;
+        const completed = false;
 
-        // Create task object
         const newTask = {
             title,
             description,
             dueDate,
             priority,
+            completed,
         };
 
-        // Update tasks state
         const updatedTasks = [...tasks, newTask];
         setTasks(updatedTasks);
+        setDataBox(!dataBox);
 
-        // Update local storage
-        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks.map(task => ({
+            ...task,
+            dueDate: task.dueDate.toISOString()
+        }))));
 
-        // Clear form inputs
+
         e.target.reset();
+    };
+
+    const handleEditClick = (index: number) => {
+        setEditIndex(index);
+        setUpdatedTask(tasks[index]);
+    };
+
+    const handleEditSubmit = () => {
+        if (editIndex !== null && updatedTask !== null) {
+            const updatedTasks = tasks.map((task, index) =>
+                index === editIndex ? updatedTask : task
+            );
+            setTasks(updatedTasks);
+            localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+
+            setEditIndex(null);
+            setUpdatedTask(null);
+        }
+    };
+
+    useEffect(() => {
+        const storedTasksString = localStorage.getItem('tasks');
+        const storedTasks = storedTasksString ? JSON.parse(storedTasksString) : [];
+        if (storedTasks) {
+            const tasksWithDateObjects = storedTasks.map((task: Task) => ({
+                ...task,
+                dueDate: new Date(task.dueDate)
+            }));
+            setTasks(tasksWithDateObjects);
+        }
+    }, []);
+
+    // For Deleting Data
+    const handleDelete = (index: number) => {
+        const updatedTasks = tasks.filter((_, i) => i !== index);
+        setTasks(updatedTasks);
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    };
+
+    // For Updating Data
+    const handleUpdate = (index: number, updatedTask: any) => {
+        const updatedTasks = tasks.map((task, i) => (i === index ? updatedTask : task));
+        setTasks(updatedTasks);
+        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    };
+
+    const getUpcomingTasks = () => {
+        return tasks.filter((task) => task.dueDate > currentDate && !completedTasks.includes(tasks.indexOf(task)));
+    };
+
+    const getOverdueTasks = () => {
+        return tasks.filter((task) => task.dueDate < currentDate && !completedTasks.includes(tasks.indexOf(task)));
+    };
+
+    const getCompletedTasks = () => {
+        return tasks.filter((task) => completedTasks.includes(tasks.indexOf(task)));
     };
 
     return (
         <div className='flex flex-row'>
+
             <div className={`flex flex-col items-center justify-between ${showdb ? 'flex' : 'hidden'} w-1/5 h-[44.8rem] bg-[#0d0c22] py-12 px-6`}>
                 <div>
                     <p className='text-white text-2xl font-semibold'>Dashboard</p>
                     <div className='flex flex-col justify-center text-white text-base font-bold text-center gap-6 mt-12'>
-                        <div className='bg-[#2f2f2f] py-2 px-6 rounded-lg'>Upcoming</div>
-                        <div className='bg-[#2f2f2f] py-2 px-6 rounded-lg'>Overdue</div>
-                        <div className='bg-[#2f2f2f] py-2 px-6 rounded-lg'>Completed</div>
+                        <button
+                            className={`py-2 px-6 rounded-lg ${clickedButton === 'All' ? 'bg-[#2f2f2f]' : ''}`}
+                            onClick={() => handleButtonClick('All')}
+                        >
+                            All
+                        </button>
+                        <button
+                            className={`py-2 px-6 rounded-lg ${clickedButton === 'Upcoming' ? 'bg-[#2f2f2f]' : ''}`}
+                            onClick={() => handleButtonClick('Upcoming')}
+                        >
+                            Upcoming
+                        </button>
+                        <button
+                            className={`py-2 px-6 rounded-lg ${clickedButton === 'Overdue' ? 'bg-[#2f2f2f]' : ''}`}
+                            onClick={() => handleButtonClick('Overdue')}
+                        >
+                            Overdue
+                        </button>
+                        <button
+                            className={`py-2 px-6 rounded-lg ${clickedButton === 'Completed' ? 'bg-[#2f2f2f]' : ''}`}
+                            onClick={() => handleButtonClick('Completed')}
+                        >
+                            Completed
+                        </button>
                     </div>
                 </div>
                 <div className='text-white'>@2024</div>
             </div>
 
             <div className='w-full h-screen px-4'>
+
+                {/* Navbar */}
                 <nav className='flex flex-row w-full h-20 p-4 justify-between'>
                     <button id='buttonV' onClick={toggleDataBox} className='py-2 px-4 rounded-lg'>Add Card</button>
                     <button id='buttonB' onClick={toggleDashboard} className='py-2 px-4 rounded-lg'>Dashboard</button>
                 </nav>
 
-                <div className={`w-full h-auto flex justify-center items-center ${dataBox ? 'flex' : 'hidden'}`}>
+                {/* Form For Adding Data */}
+                <div className={`absolute w-auto h-auto flex justify-center items-center z-10 left-1/2 ${dataBox ? 'flex' : 'hidden'}`}>
                     <form onSubmit={handleFormSubmit} className='w-96 h-auto flex flex-col gap-4 p-8 bg-zinc-300 rounded-xl'>
                         <div className='flex flex-col'>
                             <label htmlFor="title">Title</label>
@@ -91,11 +219,15 @@ const DashboardView = () => {
                         </div>
                         <div className='flex flex-col'>
                             <label htmlFor="date">Due Date</label>
-                            <input type="text" name='date' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
+                            <input type="date" name='dueDate' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
                         </div>
                         <div className='flex flex-col'>
                             <label htmlFor="priority">Priority Level</label>
-                            <input type="text" name='priority' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
+                            <select name='priority' className='bg-white p-2 w-full rounded-lg mt-1 outline-none'>
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
                         </div>
                         <button id='buttonV' className='flex items-center justify-center w-full h-auto p-2 rounded-xl mt-2'>
                             Add
@@ -103,29 +235,310 @@ const DashboardView = () => {
                     </form>
                 </div>
 
-                <div id='bgBlue' className='flex items-center md:w-80 w-full h-auto py-6 px-8 rounded-lg'>
-                    {tasks.map((task, index) => (
-                        <div key={index} className='flex flex-row w-full'>
-                            <div className='relative flex flex-col w-full gap-4'>
+                {clickedButton === "Upcoming" ? (
+                    <>
+                        {/* For Showing Upcoming Tasks Only */}
+                        <div className='px-4 mb-10'>
+                            <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
 
-                                <div className='w-auto p-2 bg-[#ff9e4f]'>
-                                    {task.priority}
-                                </div>
+                                {getUpcomingTasks().map((task, index) => (
+                                    <div id='bgBlue' key={index} className='flex flex-row md:w-80 w-full py-6 px-8 rounded-lg'>
 
-                                <div>
-                                    {task.title}
-                                </div>
+                                        <div className='relative flex flex-col w-full gap-4'>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.priority}
+                                                </div>
+                                                <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.dueDate instanceof Date ? task.dueDate.toDateString() : ''}
+                                                </div>
+                                            </div>
+                                            <div className='w-full'>
+                                                <div className='font-semibold text-2xl'>
+                                                    {task.title}
+                                                </div>
+                                                <div className='font-light text-gray-500'>
+                                                    {task.description}
+                                                </div>
+                                            </div>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='font-light text-gray-500 text-sm flex flex-row gap-2 items-center'>
+                                                    <div>
+                                                        {task.dueDate.toDateString() === currentDate.toDateString() ? (
+                                                            <div>Today</div>
+                                                        ) : task.dueDate > currentDate ? (
+                                                            <div>Upcoming</div>
+                                                        ) : (
+                                                            <div>Gone</div>
+                                                        )}
+                                                    </div>
+                                                    <div className='text-lg flex items-center justify-center'>
+                                                        <button>
+                                                            {completedTasks.includes(index) ? (
+                                                                <BiTask className='text-green-700' />
+                                                            ) : (
+                                                                <BiTaskX className='text-red-700' />
+                                                            )}
+                                                        </button>
 
-                                <div>
-                                    {task.description}
-                                </div>
-                            </div>
-                            <div className='flex flex-col w-1/5'>
-                                <div>{task.dueDate}</div>
+                                                    </div>
+                                                </div>
+                                                <div className='w-full flex flex-row justify-end gap-4 text-2xl'>
+                                                    <button className='text-[red]' onClick={() => handleDelete(index)}><MdDelete /></button>
+                                                    <button className='text-[blue] text-xl' onClick={() => handleEditClick(index)}><FaEdit /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </>
+                ) : clickedButton === "Overdue" ? (
+                    <>
+                        {/* For Showing OverDue Tasks Only */}
+                        <div className='px-4 mb-10'>
+                            <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+
+                                {getOverdueTasks().map((task, index) => (
+                                    <div id='bgBlue' key={index} className='flex flex-row md:w-80 w-full py-6 px-8 rounded-lg'>
+
+                                        <div className='relative flex flex-col w-full gap-4'>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.priority}
+                                                </div>
+                                                <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.dueDate instanceof Date ? task.dueDate.toDateString() : ''}
+                                                </div>
+                                            </div>
+                                            <div className='w-full'>
+                                                <div className='font-semibold text-2xl'>
+                                                    {task.title}
+                                                </div>
+                                                <div className='font-light text-gray-500'>
+                                                    {task.description}
+                                                </div>
+                                            </div>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='font-light text-gray-500 text-sm flex flex-row gap-2 items-center'>
+                                                    <div>
+                                                        {task.dueDate.toDateString() === currentDate.toDateString() ? (
+                                                            <div>Today</div>
+                                                        ) : task.dueDate > currentDate ? (
+                                                            <div>Upcoming</div>
+                                                        ) : (
+                                                            <div>Gone</div>
+                                                        )}
+                                                    </div>
+                                                    <div className='text-lg flex items-center justify-center'>
+                                                        <button>
+                                                            {completedTasks.includes(index) ? <BiTask className='text-green-700' /> : <BiTaskX className='text-red-700' />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className='w-full flex flex-row justify-end gap-4 text-2xl'>
+                                                    <button className='text-[red]' onClick={() => handleDelete(index)}><MdDelete /></button>
+                                                    <button className='text-[blue] text-xl' onClick={() => handleEditClick(index)}><FaEdit /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                ) : clickedButton === "Completed" ? (
+                    <>
+                        {/* For Showing Completed Tasks Only */}
+                        <div className='px-4 mb-10'>
+                            <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+
+                                {getCompletedTasks().map((task, index) => (
+                                    <div id='bgBlue' key={index} className='flex flex-row md:w-80 w-full py-6 px-8 rounded-lg'>
+
+                                        <div className='relative flex flex-col w-full gap-4'>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.priority}
+                                                </div>
+                                                <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.dueDate instanceof Date ? task.dueDate.toDateString() : ''}
+                                                </div>
+                                            </div>
+                                            <div className='w-full'>
+                                                <div className='font-semibold text-2xl'>
+                                                    {task.title}
+                                                </div>
+                                                <div className='font-light text-gray-500'>
+                                                    {task.description}
+                                                </div>
+                                            </div>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='font-light text-gray-500 text-sm flex flex-row gap-2 items-center'>
+                                                    <div>
+                                                        {task.dueDate.toDateString() === currentDate.toDateString() ? (
+                                                            <div>Today</div>
+                                                        ) : task.dueDate > currentDate ? (
+                                                            <div>Upcoming</div>
+                                                        ) : (
+                                                            <div>Gone</div>
+                                                        )}
+                                                    </div>
+                                                    <div className='text-lg flex items-center justify-center'>
+                                                        <button>
+                                                            {completedTasks.includes(index) ? (
+                                                                <BiTaskX className='text-red-700' />
+                                                            ) : (
+                                                                <BiTask className='text-green-700' />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className='w-full flex flex-row justify-end gap-4 text-2xl'>
+                                                    <button className='text-[red]' onClick={() => handleDelete(index)}><MdDelete /></button>
+                                                    <button className='text-[blue] text-xl' onClick={() => handleEditClick(index)}><FaEdit /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* For Showing All Data */}
+                        <div className='px-4 mb-10'>
+                            <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+
+                                {tasks.map((task, index) => (
+                                    <div id='bgBlue' key={index} className='flex flex-row md:w-80 w-full py-6 px-8 rounded-lg'>
+
+                                        <div className='relative flex flex-col w-full gap-4'>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.priority}
+                                                </div>
+                                                <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                    {task.dueDate instanceof Date ? task.dueDate.toDateString() : ''}
+                                                </div>
+                                            </div>
+                                            <div className='w-full'>
+                                                <div className='font-semibold text-2xl'>
+                                                    {task.title}
+                                                </div>
+                                                <div className='font-light text-gray-500'>
+                                                    {task.description}
+                                                </div>
+                                            </div>
+                                            <div className='flex flex-row justify-between'>
+                                                <div className='font-light text-gray-500 text-sm flex flex-row gap-2 items-center'>
+                                                    <div>
+                                                        {task.dueDate.toDateString() === currentDate.toDateString() ? (
+                                                            <div>Today</div>
+                                                        ) : task.dueDate > currentDate ? (
+                                                            <div>Upcoming</div>
+                                                        ) : (
+                                                            <div>Gone</div>
+                                                        )}
+                                                    </div>
+                                                    <div className='text-lg flex items-center justify-center'>
+                                                        <button onClick={() => taskCompleted(index)}>
+                                                            {completedTasks.includes(index) ? (
+                                                                <BiTask className='text-green-700' />
+                                                            ) : (
+                                                                <BiTaskX className='text-red-700' />
+                                                            )}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className='w-full flex flex-row justify-end gap-4 text-2xl'>
+                                                    <button className='text-[red]' onClick={() => handleDelete(index)}><MdDelete /></button>
+                                                    <button className='text-[blue] text-xl' onClick={() => handleEditClick(index)}><FaEdit /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {/* Form For Editing Data */}
+                {editIndex !== null && updatedTask && (
+                    <div className='absolute w-auto h-auto flex justify-center items-center z-10 left-1/2 top-1/4'>
+                        <form onSubmit={handleEditSubmit} className='w-96 h-auto flex flex-col gap-4 p-8 bg-zinc-300 rounded-xl'>
+                            <div className='flex flex-col'>
+                                <label htmlFor="title">Title</label>
+                                <input
+                                    type="text"
+                                    name='title'
+                                    value={updatedTask.title}
+                                    onChange={(e) =>
+                                        setUpdatedTask({
+                                            ...updatedTask,
+                                            title: e.target.value,
+                                        })
+                                    }
+                                    className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
+                                />
+                            </div>
+                            <div className='flex flex-col'>
+                                <label htmlFor="description">Description</label>
+                                <input
+                                    type="text"
+                                    name='description'
+                                    value={updatedTask.description}
+                                    onChange={(e) =>
+                                        setUpdatedTask({
+                                            ...updatedTask,
+                                            description: e.target.value,
+                                        })
+                                    }
+                                    className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
+                                />
+                            </div>
+                            <div className='flex flex-col'>
+                                <label htmlFor="date">Due Date</label>
+                                <input
+                                    type="date"
+                                    name='date'
+                                    value={updatedTask.dueDate instanceof Date ? updatedTask.dueDate.toISOString().split('T')[0] : ''}
+                                    onChange={(e) =>
+                                        setUpdatedTask({
+                                            ...updatedTask,
+                                            dueDate: new Date(e.target.value),
+                                        })
+                                    }
+                                    className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
+                                />
+
+                            </div>
+                            <div className='flex flex-col'>
+                                <label htmlFor="priority">Priority Level</label>
+                                <input
+                                    type="text"
+                                    name='priority'
+                                    value={updatedTask.priority}
+                                    onChange={(e) =>
+                                        setUpdatedTask({
+                                            ...updatedTask,
+                                            priority: e.target.value,
+                                        })
+                                    }
+                                    className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
+                                />
+                            </div>
+                            <button id='buttonV' type="submit" className='py-2 rounded-lg mt-2'>Save Changes</button>
+                        </form>
+                    </div>
+                )}
 
             </div>
         </div>
