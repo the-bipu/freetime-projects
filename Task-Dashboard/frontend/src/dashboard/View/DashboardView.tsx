@@ -31,17 +31,6 @@ const DashboardView = () => {
         setClickedButton(buttonName);
     };
 
-    // const taskCompleted = (index: number) => {
-    //     const taskIndex = completedTasks.indexOf(index);
-    //     if (taskIndex !== -1) {
-    //         const updatedCompletedTasks = completedTasks.filter((task) => task !== index);
-    //         setCompletedTasks(updatedCompletedTasks);
-    //     } else {
-    //         const updatedCompletedTasks = [...completedTasks, index];
-    //         setCompletedTasks(updatedCompletedTasks);
-    //     }
-    // };
-
     const taskCompleted = (index: number) => {
         const completedIndex = completedTasks.indexOf(index);
 
@@ -390,9 +379,9 @@ const DashboardView = () => {
                                                     <div className='text-lg flex items-center justify-center'>
                                                         <button>
                                                             {completedTasks.includes(index) ? (
-                                                                <BiTaskX className='text-red-700' />
-                                                            ) : (
                                                                 <BiTask className='text-green-700' />
+                                                            ) : (
+                                                                <BiTaskX className='text-red-700' />
                                                             )}
                                                         </button>
                                                     </div>
