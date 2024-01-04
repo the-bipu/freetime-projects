@@ -6,6 +6,7 @@ import EditTask from '../components/EditTask/EditTask';
 import AddTask from '../components/AddTask/AddTask';
 import DashboardSidebar from '../components/DashboardSidebar/DashboardSidebar';
 import TaskItem from '../components/TaskItem/TaskItem';
+import AddItem from '../components/AddItem/AddItem';
 
 interface Task {
     title: string;
@@ -134,11 +135,9 @@ const DashboardView = () => {
     };
 
     return (
-        <div className='flex flex-row w-full h-full justify-center items-start'>
+        <div className='flex flex-row w-full h-full justify-center items-start bg-white'>
 
-            <DashboardSidebar showdb={showdb} clickedButton={clickedButton} handleButtonClick={handleButtonClick} />
-
-            <div className={`${showdb ? 'w-4/5' : 'w-full'} h-full`}>
+            <div className={`w-full h-full`}>
 
                 {/* Form For Adding Data */}
                 <AddTask
@@ -159,12 +158,14 @@ const DashboardView = () => {
 
                 {/* Navbar */}
                 <nav className='flex flex-row w-full h-20 p-4 justify-between bg-white'>
-                    <button id='buttonV' onClick={toggleDataBox} className='py-2 px-4 rounded-lg'>Add Card</button>
+                    <div>Hello</div>
                     <div className='flex gap-4'>
                         <button id='buttonB' onClick={toggleDashboard} className='py-2 px-4 rounded-lg'>Dashboard</button>
                         <button id='buttonB' onClick={toggleSearchBar} className='py-2 px-4 rounded-lg'>SearchBar</button>
                     </div>
                 </nav>
+
+                <DashboardSidebar showdb={showdb} clickedButton={clickedButton} handleButtonClick={handleButtonClick} />
 
                 <div className={`${showSearch ? "flex" : "hidden"} flex-col items-center justify-center w-full h-12 mb-10 mt-8`}>
                     <input id='bgBlue' type="text" className='md:w-1/4 h-full rounded-lg outline-none p-4' />
@@ -175,6 +176,8 @@ const DashboardView = () => {
                         {/* For Showing Upcoming Tasks Only */}
                         <div className='px-4 mb-10 mt-10'>
                             <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+
+                                <AddItem toggleDataBox={toggleDataBox} />
 
                                 {getUpcomingTasks().map((task, index) => (
                                     <TaskItem
@@ -195,6 +198,8 @@ const DashboardView = () => {
                         <div className='px-4 mb-10 mt-10'>
                             <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
 
+                                <AddItem toggleDataBox={toggleDataBox} />
+
                                 {getOverdueTasks().map((task, index) => (
                                     <TaskItem
                                         key={index}
@@ -213,6 +218,8 @@ const DashboardView = () => {
                         {/* For Showing Completed Tasks Only */}
                         <div className='px-4 mb-10 mt-10'>
                             <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+
+                                <AddItem toggleDataBox={toggleDataBox} />
 
                                 {getCompletedTasks().map((task, index) => (
                                     <TaskItem
@@ -233,6 +240,8 @@ const DashboardView = () => {
                         {/* For Showing All Data */}
                         <div className='px-4 mb-10 mt-10'>
                             <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+
+                                <AddItem toggleDataBox={toggleDataBox} />
 
                                 {tasks.map((task, index) => (
                                     <TaskItem
