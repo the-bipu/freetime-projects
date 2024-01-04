@@ -20,7 +20,7 @@ const EditTask: React.FC<EditTaskProps> = ({ showdb, editIndex, updatedTask, han
     return (
         <div>
             {editIndex !== null && updatedTask && (
-                <div className={`absolute ${showdb ? 'w-4/5' : 'w-full'} h-full flex justify-center items-center z-10 bg-[#1414146e]`}>
+                <div className={`absolute w-full h-full flex justify-center items-center z-10 bg-[#1414146e]`}>
                     <form onSubmit={handleEditSubmit} className='w-96 h-auto flex flex-col gap-4 p-8 bg-zinc-300 rounded-xl'>
                         <div className='flex flex-col'>
                             <label htmlFor="title">Title</label>

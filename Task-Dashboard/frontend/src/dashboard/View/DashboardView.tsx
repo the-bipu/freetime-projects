@@ -135,7 +135,7 @@ const DashboardView = () => {
     };
 
     return (
-        <div className='flex flex-row w-full h-full justify-center items-start bg-white'>
+        <div className='flex flex-row w-full h-full justify-center items-start bg-white pb-8'>
 
             <div className={`w-full h-full`}>
 
@@ -156,14 +156,7 @@ const DashboardView = () => {
                     setUpdatedTask={setUpdatedTask}
                 />
 
-                {/* Navbar */}
-                <nav className='flex flex-row w-full h-20 p-4 justify-between bg-white'>
-                    <div>Hello</div>
-                    <div className='flex gap-4'>
-                        <button id='buttonB' onClick={toggleDashboard} className='py-2 px-4 rounded-lg'>Dashboard</button>
-                        <button id='buttonB' onClick={toggleSearchBar} className='py-2 px-4 rounded-lg'>SearchBar</button>
-                    </div>
-                </nav>
+                <Navbar />
 
                 <DashboardSidebar showdb={showdb} clickedButton={clickedButton} handleButtonClick={handleButtonClick} />
 
