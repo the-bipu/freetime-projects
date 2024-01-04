@@ -19,7 +19,7 @@ const AddTask: React.FC<AddTaskProps> = ({ showdb, toggleDataBox, dataBox, handl
   return (
     <>
 
-        <div className={`absolute ${showdb ? 'w-4/5' : 'w-full'} h-full flex flex-col justify-center items-center z-10 bg-[#1414146e] ${dataBox ? 'flex' : 'hidden'}`}>
+        <div className={`absolute w-full h-full flex flex-col justify-center items-center z-10 bg-[#1414146e] ${dataBox ? 'flex' : 'hidden'}`}>
                 <button onClick={toggleDataBox} className='bg-zinc-300 px-4 py-2 rounded-full'>X</button>
 
                 <form onSubmit={handleFormSubmit} className='relative w-96 h-auto flex flex-col gap-4 p-8 bg-zinc-300 rounded-xl'>

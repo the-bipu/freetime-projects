@@ -19,7 +19,7 @@ interface TaskItemProps {
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, index, currentDate, handleDelete, handleEditClick }) => {
     return (
-        <div id='bgBlue' key={index} className='flex flex-row md:w-80 w-full py-6 px-8 rounded-lg shadowCard'>
+        <div id='bgBlue' key={index} className='flex flex-row md:w-80 w-full min-h-48 py-6 px-8 rounded-lg shadowCard'>
 
             <div className='relative flex flex-col w-full gap-4'>
                 <div className='flex flex-row justify-between'>
