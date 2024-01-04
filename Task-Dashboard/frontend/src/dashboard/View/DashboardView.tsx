@@ -12,7 +12,7 @@ interface Task {
     description: string;
     dueDate: Date;
     priority: string;
-    completed: boolean;
+    status: string;
 }
 
 const DashboardView = () => {
@@ -30,29 +30,6 @@ const DashboardView = () => {
         console.log(clickedButton);
         setClickedButton(buttonName);
     };
-
-    const taskCompleted = (index: number) => {
-        const completedIndex = completedTasks.indexOf(index);
-
-        if (completedIndex !== -1) {
-            const updatedCompletedTasks = completedTasks.filter((task) => task !== index);
-            setCompletedTasks(updatedCompletedTasks);
-        } else {
-            const updatedCompletedTasks = [...completedTasks, index];
-            setCompletedTasks(updatedCompletedTasks);
-        }
-
-        const updatedTasks = tasks.map((task, i) => {
-            if (i === index) {
-                return { ...task, completed: !task.completed };
-            }
-            return task;
-        });
-
-        setTasks(updatedTasks);
-        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    };
-
 
     const currentDate = new Date();
     console.log(currentDate);
@@ -72,14 +49,14 @@ const DashboardView = () => {
         const description = e.target.elements.description.value;
         const dueDate = new Date(e.target.elements.dueDate.value);
         const priority = e.target.elements.priority.value;
-        const completed = false;
+        const status = e.target.elements.status.value;
 
         const newTask = {
             title,
             description,
             dueDate,
             priority,
-            completed,
+            status,
         };
 
         const updatedTasks = [...tasks, newTask];
@@ -148,11 +125,11 @@ const DashboardView = () => {
     };
 
     const getCompletedTasks = () => {
-        return tasks.filter((task) => completedTasks.includes(tasks.indexOf(task)));
+        return tasks.filter((task) => task.status === 'true');
     };
 
     return (
-        <div className='flex flex-row'>
+        <div className='flex flex-row w-full'>
 
             <div className={`flex flex-col items-center justify-between ${showdb ? 'flex' : 'hidden'} w-1/5 h-[44.8rem] bg-[#0d0c22] py-12 px-6`}>
                 <div>
@@ -187,30 +164,25 @@ const DashboardView = () => {
                 <div className='text-white'>@2024</div>
             </div>
 
-            <div className='w-full h-screen px-4'>
+            {/* Form For Adding Data */}
+            <div className={`absolute w-auto h-auto flex flex-col justify-center items-center z-10 left-1/2 ${dataBox ? 'flex' : 'hidden'}`}>
+                <button onClick={toggleDataBox} className='bg-zinc-300 px-4 py-2 rounded-full'>X</button>
 
-                {/* Navbar */}
-                <nav className='flex flex-row w-full h-20 p-4 justify-between'>
-                    <button id='buttonV' onClick={toggleDataBox} className='py-2 px-4 rounded-lg'>Add Card</button>
-                    <button id='buttonB' onClick={toggleDashboard} className='py-2 px-4 rounded-lg'>Dashboard</button>
-                </nav>
-
-                {/* Form For Adding Data */}
-                <div className={`absolute w-auto h-auto flex justify-center items-center z-10 left-1/2 ${dataBox ? 'flex' : 'hidden'}`}>
-                    <form onSubmit={handleFormSubmit} className='w-96 h-auto flex flex-col gap-4 p-8 bg-zinc-300 rounded-xl'>
-                        <div className='flex flex-col'>
-                            <label htmlFor="title">Title</label>
-                            <input type="text" name='title' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
-                        </div>
-                        <div className='flex flex-col'>
-                            <label htmlFor="description">Description</label>
-                            <input type="text" name='description' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
-                        </div>
-                        <div className='flex flex-col'>
-                            <label htmlFor="date">Due Date</label>
-                            <input type="date" name='dueDate' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
-                        </div>
-                        <div className='flex flex-col'>
+                <form onSubmit={handleFormSubmit} className='relative w-96 h-auto flex flex-col gap-4 p-8 bg-zinc-300 rounded-xl'>
+                    <div className='flex flex-col'>
+                        <label htmlFor="title">Title</label>
+                        <input type="text" name='title' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
+                    </div>
+                    <div className='flex flex-col'>
+                        <label htmlFor="description">Description</label>
+                        <input type="text" name='description' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
+                    </div>
+                    <div className='flex flex-col'>
+                        <label htmlFor="date">Due Date</label>
+                        <input type="date" name='dueDate' className='bg-white p-2 w-full rounded-lg mt-1 outline-none' />
+                    </div>
+                    <div className='flex flex-row w-full gap-2'>
+                        <div className='flex flex-col w-1/3'>
                             <label htmlFor="priority">Priority Level</label>
                             <select name='priority' className='bg-white p-2 w-full rounded-lg mt-1 outline-none'>
                                 <option value="Easy">Easy</option>
@@ -218,11 +190,27 @@ const DashboardView = () => {
                                 <option value="Hard">Hard</option>
                             </select>
                         </div>
-                        <button id='buttonV' className='flex items-center justify-center w-full h-auto p-2 rounded-xl mt-2'>
-                            Add
-                        </button>
-                    </form>
-                </div>
+                        <div className='flex flex-col w-2/3'>
+                            <label htmlFor="status">Completed</label>
+                            <select name='status' className='bg-white p-2 w-full rounded-lg mt-1 outline-none'>
+                                <option value="false">Not Completed</option>
+                                <option value="true">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id='buttonV' className='flex items-center justify-center w-full h-auto p-2 rounded-xl mt-2'>
+                        Add
+                    </button>
+                </form>
+            </div>
+
+            <div className='w-full h-screen px-4'>
+
+                {/* Navbar */}
+                <nav className='flex flex-row w-full h-20 p-4 justify-between'>
+                    <button id='buttonV' onClick={toggleDataBox} className='py-2 px-4 rounded-lg'>Add Card</button>
+                    <button id='buttonB' onClick={toggleDashboard} className='py-2 px-4 rounded-lg'>Dashboard</button>
+                </nav>
 
                 {clickedButton === "Upcoming" ? (
                     <>
@@ -235,7 +223,12 @@ const DashboardView = () => {
 
                                         <div className='relative flex flex-col w-full gap-4'>
                                             <div className='flex flex-row justify-between'>
-                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                <div
+                                                    className={`w-auto px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm 
+                                                    ${task.priority === 'Hard' ? 'bg-red-500' :
+                                                            task.priority === 'Medium' ? 'bg-orange-500' :
+                                                                'bg-green-500'}`}
+                                                >
                                                     {task.priority}
                                                 </div>
                                                 <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
@@ -263,11 +256,11 @@ const DashboardView = () => {
                                                     </div>
                                                     <div className='text-lg flex items-center justify-center'>
                                                         <button>
-                                                            {completedTasks.includes(index) ? (
+                                                            {/* {completedTasks.includes(index) ? (
                                                                 <BiTask className='text-green-700' />
                                                             ) : (
                                                                 <BiTaskX className='text-red-700' />
-                                                            )}
+                                                            )} */}
                                                         </button>
 
                                                     </div>
@@ -295,7 +288,12 @@ const DashboardView = () => {
 
                                         <div className='relative flex flex-col w-full gap-4'>
                                             <div className='flex flex-row justify-between'>
-                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                <div
+                                                    className={`w-auto px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm 
+                                                    ${task.priority === 'Hard' ? 'bg-red-500' :
+                                                            task.priority === 'Medium' ? 'bg-orange-500' :
+                                                                'bg-green-500'}`}
+                                                >
                                                     {task.priority}
                                                 </div>
                                                 <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
@@ -323,7 +321,7 @@ const DashboardView = () => {
                                                     </div>
                                                     <div className='text-lg flex items-center justify-center'>
                                                         <button>
-                                                            {completedTasks.includes(index) ? <BiTask className='text-green-700' /> : <BiTaskX className='text-red-700' />}
+                                                            {/* {completedTasks.includes(index) ? <BiTask className='text-green-700' /> : <BiTaskX className='text-red-700' />} */}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -350,7 +348,12 @@ const DashboardView = () => {
 
                                         <div className='relative flex flex-col w-full gap-4'>
                                             <div className='flex flex-row justify-between'>
-                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                <div
+                                                    className={`w-auto px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm 
+                                                    ${task.priority === 'Hard' ? 'bg-red-500' :
+                                                            task.priority === 'Medium' ? 'bg-orange-500' :
+                                                                'bg-green-500'}`}
+                                                >
                                                     {task.priority}
                                                 </div>
                                                 <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
@@ -378,11 +381,7 @@ const DashboardView = () => {
                                                     </div>
                                                     <div className='text-lg flex items-center justify-center'>
                                                         <button>
-                                                            {completedTasks.includes(index) ? (
-                                                                <BiTask className='text-green-700' />
-                                                            ) : (
-                                                                <BiTaskX className='text-red-700' />
-                                                            )}
+                                                            <BiTask className='text-green-700' />
                                                         </button>
                                                     </div>
                                                 </div>
@@ -409,7 +408,12 @@ const DashboardView = () => {
 
                                         <div className='relative flex flex-col w-full gap-4'>
                                             <div className='flex flex-row justify-between'>
-                                                <div className='w-auto bg-[#fd9d54] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
+                                                <div
+                                                    className={`w-auto px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm 
+                                                    ${task.priority === 'Hard' ? 'bg-red-500' :
+                                                            task.priority === 'Medium' ? 'bg-orange-500' :
+                                                                'bg-green-500'}`}
+                                                >
                                                     {task.priority}
                                                 </div>
                                                 <div className='w-auto bg-[#3638b8] px-4 py-1 flex items-center justify-center rounded-md text-white font-bold text-sm'>
@@ -436,13 +440,14 @@ const DashboardView = () => {
                                                         )}
                                                     </div>
                                                     <div className='text-lg flex items-center justify-center'>
-                                                        <button onClick={() => taskCompleted(index)}>
-                                                            {completedTasks.includes(index) ? (
+                                                        <button>
+                                                            {task.status === 'true' ? (
                                                                 <BiTask className='text-green-700' />
                                                             ) : (
                                                                 <BiTaskX className='text-red-700' />
                                                             )}
                                                         </button>
+
                                                     </div>
                                                 </div>
                                                 <div className='w-full flex flex-row justify-end gap-4 text-2xl'>
@@ -509,20 +514,42 @@ const DashboardView = () => {
                                 />
 
                             </div>
-                            <div className='flex flex-col'>
-                                <label htmlFor="priority">Priority Level</label>
-                                <input
-                                    type="text"
-                                    name='priority'
-                                    value={updatedTask.priority}
-                                    onChange={(e) =>
-                                        setUpdatedTask({
-                                            ...updatedTask,
-                                            priority: e.target.value,
-                                        })
-                                    }
-                                    className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
-                                />
+                            <div className='flex flex-row w-full'>
+                                <div className='flex flex-col w-1/3'>
+                                    <label htmlFor="priority">Priority Level</label>
+                                    <select
+                                        name='priority'
+                                        value={updatedTask.priority}
+                                        onChange={(e) =>
+                                            setUpdatedTask({
+                                                ...updatedTask,
+                                                priority: e.target.value,
+                                            })
+                                        }
+                                        className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
+                                    >
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div className='flex flex-col w-2/3'>
+                                    <label htmlFor="status">Complete</label>
+                                    <select
+                                        name='status'
+                                        value={updatedTask.status}
+                                        onChange={(e) =>
+                                            setUpdatedTask({
+                                                ...updatedTask,
+                                                status: e.target.value,
+                                            })
+                                        }
+                                        className='bg-white p-2 w-full rounded-lg mt-1 outline-none'
+                                    >
+                                        <option value="false">Not Completed</option>
+                                        <option value="true">Completed</option>
+                                    </select>
+                                </div>
                             </div>
                             <button id='buttonV' type="submit" className='py-2 rounded-lg mt-2'>Save Changes</button>
                         </form>
