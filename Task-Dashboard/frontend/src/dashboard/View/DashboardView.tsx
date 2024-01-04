@@ -7,6 +7,7 @@ import AddTask from '../components/AddTask/AddTask';
 import DashboardSidebar from '../components/DashboardSidebar/DashboardSidebar';
 import TaskItem from '../components/TaskItem/TaskItem';
 import AddItem from '../components/AddItem/AddItem';
+import Navbar from '../components/Navbar/Navbar';
 
 interface Task {
     title: string;

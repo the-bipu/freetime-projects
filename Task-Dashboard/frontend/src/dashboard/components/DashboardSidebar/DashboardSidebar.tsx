@@ -8,7 +8,7 @@ interface DashboardSidebarProps {
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ showdb, clickedButton, handleButtonClick }) => {
     return (
-        <div className={`flex flex-row items-center justify-end 'w-full' h-20 bg-[#ffffff] px-12`}>
+        <div className={`flex flex-row items-center justify-end 'w-full' h-20 bg-[#ffffff] px-12 mt-2`}>
             <div className='flex flex-row justify-center text-black text-base font-bold text-center gap-2'>
                 <button
                     id={`${clickedButton === 'All' ? 'bgBlue' : ''}`}
