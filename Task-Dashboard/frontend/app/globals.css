@@ -7,6 +7,18 @@
 
 body {
   color: #222;
-  background: #e7dfdf;
+  background: #ffffff;
   font-family: 'Poppins', sans-serif;
+}
+
+html::-webkit-scrollbar {
+  width: .3rem;
+}
+
+html::-webkit-scrollbar-track {
+  background: white;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #c2c2c2;
 }

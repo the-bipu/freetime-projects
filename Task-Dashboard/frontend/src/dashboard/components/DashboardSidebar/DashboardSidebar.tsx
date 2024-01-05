@@ -1,12 +1,11 @@
 import React from 'react';
 
 interface DashboardSidebarProps {
-    showdb: boolean;
     clickedButton: string;
     handleButtonClick: (buttonName: string) => void;
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ showdb, clickedButton, handleButtonClick }) => {
+const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ clickedButton, handleButtonClick }) => {
     return (
         <div className={`flex flex-row items-center justify-end 'w-full' h-20 bg-[#ffffff] px-12 mt-2`}>
             <div className='flex flex-row justify-center text-black text-base font-bold text-center gap-2'>
