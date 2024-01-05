@@ -8,6 +8,7 @@ import DashboardSidebar from '../components/DashboardSidebar/DashboardSidebar';
 import TaskItem from '../components/TaskItem/TaskItem';
 import AddItem from '../components/AddItem/AddItem';
 import Navbar from '../components/Navbar/Navbar';
+import SearchResultComponent from '../components/SearchResultsComponent/SearchResultsComponent';
 
 interface Task {
     title: string;
@@ -29,13 +30,34 @@ const DashboardView = () => {
     const [completedTasks, setCompletedTasks] = useState<number[]>([]);
     const [clickedButton, setClickedButton] = useState('All');
 
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<Task[]>([]);
+
     const handleButtonClick = (buttonName: string) => {
         console.log(clickedButton);
         setClickedButton(buttonName);
     };
 
     const currentDate = new Date();
-    console.log(currentDate);
+
+    const handleSearch = (event: { target: { value: any } }) => {
+        const query = event.target.value;
+        setSearchQuery(query);
+
+        const storedData = localStorage.getItem('tasks');
+        if (storedData) {
+            const parsedData: Task[] = JSON.parse(storedData);
+            const filteredResults = parsedData.filter((item: Task) =>
+                item.title.toLowerCase().includes(query.toLowerCase())
+            ).map((filteredTask: Task) => ({
+                ...filteredTask,
+                dueDate: new Date(filteredTask.dueDate)
+            }));
+            setSearchResults([...filteredResults]);
+        } else {
+            setSearchResults([]);
+        }
+    };
 
     const toggleDashboard = () => {
         setShowdb(!showdb);
@@ -75,7 +97,6 @@ const DashboardView = () => {
             dueDate: task.dueDate.toISOString()
         }))));
 
-
         e.target.reset();
     };
 
@@ -99,11 +120,12 @@ const DashboardView = () => {
 
     useEffect(() => {
         const storedTasksString = localStorage.getItem('tasks');
+
         const storedTasks = storedTasksString ? JSON.parse(storedTasksString) : [];
         if (storedTasks) {
             const tasksWithDateObjects = storedTasks.map((task: Task) => ({
                 ...task,
-                dueDate: new Date(task.dueDate)
+                dueDate: new Date(task.dueDate),
             }));
             setTasks(tasksWithDateObjects);
         }
@@ -159,11 +181,16 @@ const DashboardView = () => {
 
                 <Navbar />
 
-                <DashboardSidebar showdb={showdb} clickedButton={clickedButton} handleButtonClick={handleButtonClick} />
+                <DashboardSidebar clickedButton={clickedButton} handleButtonClick={handleButtonClick} />
 
-                <div className={`${showSearch ? "flex" : "hidden"} flex-col items-center justify-center w-full h-12 mb-10 mt-8`}>
-                    <input id='bgBlue' type="text" className='md:w-1/4 h-full rounded-lg outline-none p-4' />
+                <div className={`flex flex-col items-start justify-start w-full h-12 mb-10 mt-8 px-24`}>
+                    <input type="text" className='md:w-80 h-full rounded-lg outline-none p-4 innerShadow' value={searchQuery}
+                        onChange={handleSearch} />
                 </div>
+
+                {clickedButton === "All" && searchQuery !== '' && (
+                    <SearchResultComponent searchResults={searchResults} currentDate={currentDate} handleDelete={handleDelete} handleEditClick={handleEditClick} />
+                )}
 
                 {clickedButton === "Upcoming" ? (
                     <>
