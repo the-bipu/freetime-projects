@@ -28,20 +28,31 @@ const SearchResultComponent: React.FC<SearchResultProps> = ({
         <div className='px-4 mb-20 mt-10'>
             <p className='px-20 mb-4'>Search Results:</p>
 
-            <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto'>
+            <div className='flex flex-row flex-wrap items-center justify-center gap-4 w-auto h-auto mb-8'>
 
-                {searchResults.map((task, index) => (
-                    <TaskItem
-                        key={index}
-                        task={task}
-                        index={index}
-                        currentDate={currentDate}
-                        handleDelete={handleDelete}
-                        handleEditClick={handleEditClick}
-                    />
-                ))}
+                {searchResults.length > 0 ? (
+                    <>
+                        {searchResults.map((task, index) => (
+                            <TaskItem
+                                key={index}
+                                task={task}
+                                index={index}
+                                currentDate={currentDate}
+                                handleDelete={handleDelete}
+                                handleEditClick={handleEditClick}
+                            />
+                        ))}
+                    </>
+                ) : (
+                    <>
+                        <p>No Matching Data</p>
+                    </>
+                )}
+
 
             </div>
+
+            <hr className='w-auto mt-4 mx-20 border-1' />
         </div>
     );
 };
