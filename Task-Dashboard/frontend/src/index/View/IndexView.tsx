@@ -129,7 +129,8 @@ const IndexView = () => {
       ) : (
         <>
           <div className='h-screen w-5/12 bg-[#F9F8FD] flex flex-col pt-12 px-16'>
-            <h3 className='text-2xl font-bold text-[#222A51]'>Summary</h3>
+            <h3 className='text-2xl font-bold text-[#222A51] mb-12'>Summary</h3>
+            <div className='w-64 h-64 bg-white rounded-xl'></div>
           </div>
         </>
       )}
